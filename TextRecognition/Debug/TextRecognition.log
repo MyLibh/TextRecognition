@@ -1,0 +1,1 @@
+﻿opencv_world330.lib(opencv_world330.dll) : fatal error LNK1112: тип компьютера модуля "x64" противоречит типу целевого компьютера "x86"
