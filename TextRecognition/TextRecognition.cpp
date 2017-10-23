@@ -1,17 +1,34 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "TextRecognition.hpp"
 
-cv::Mat FilterImage(CONST cv::Mat &crmImage, std::vector<std::vector<cv::Point>> &rContours)
+inline VOID ShowWindow(CONST std::string &crsTitle, CONST cv::Mat &crmImage)
+{
+#ifdef SHOW_ALL
+	cv::imshow(crsTitle, crmImage);
+	cv::waitKeyEx(0);
+#endif // SHOW_ALL
+}
+
+cv::Mat FilterImageAndFindContours(CONST cv::Mat &crmImage, std::vector<std::vector<cv::Point>> &rContours)
 {
 	cv::Mat mImage = crmImage.clone();
+	ShowWindow("Normal", mImage);
+
 	cv::cvtColor(mImage, mImage, CV_BGR2GRAY);
+	ShowWindow("Converted", mImage);
 
 	cv::GaussianBlur(mImage, mImage, cv::Size(5, 5), NULL);
+	ShowWindow("Gaussed", mImage);
 
 	cv::adaptiveThreshold(mImage, mImage, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 11, 2);
+	ShowWindow("Thresholded", mImage);
 
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(mImage, rContours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
+	cv::destroyAllWindows();
 	return mImage;
 }
 
@@ -37,7 +54,7 @@ BOOL LearnSymbols()
 	}
 
 	std::vector<std::vector<cv::Point>> contours;
-	FilterImage(mLearn, contours);
+	FilterImageAndFindContours(mLearn, contours);
 
 	cv::Mat mTrained,
 		    mClassification;
@@ -45,7 +62,7 @@ BOOL LearnSymbols()
 	for(SIZE_T i = 0; i < contours.size(); ++i)
 		if(cv::contourArea(contours[i]) > MIN_CONTOUR_AREA)
 		{               
-			cv::rectangle(mLearn, cv::boundingRect(contours[i]), cv::Scalar(255, 0, 0), 2);
+			cv::rectangle(mLearn, cv::boundingRect(contours[i]), cv::Scalar(255, 0, 0), 2); 
 
 			cv::Mat mRect = mLearn(cv::boundingRect(contours[i]));
 			cv::resize(mRect, mRect, cv::Size(20, 30));
@@ -53,10 +70,10 @@ BOOL LearnSymbols()
 			cv::imshow("Learning", mLearn);
 			cv::imshow("Symbol", mRect);                              
 			      
-			auto key = cv::waitKey(0);           
+			auto key = cv::waitKeyEx(0);           
 			std::cout << "\t" << key << std::endl;
 
-			cv::rectangle(mLearn, cv::boundingRect(contours[i]), cv::Scalar(255, 255, 255), MIN_CONTOUR_AREA / 4 + 8);
+			cv::rectangle(mLearn, cv::boundingRect(contours[i]), cv::Scalar(255, 255, 255), (MIN_CONTOUR_AREA >> 2) + 8);
 
 			if(std::find(chars.begin(), chars.end(), key) != chars.end())
 			{    
@@ -67,7 +84,6 @@ BOOL LearnSymbols()
 
 				cv::Mat mTmp = mFloat.reshape(1, 1);
 				mTrained.push_back(mTmp);
-
 			}   
 		}    
 	cv::destroyAllWindows();
@@ -109,7 +125,7 @@ BOOL FindSymbols(std::string *pResult /* = new std::string*/)
 	cv::Ptr<cv::ml::KNearest> model(cv::ml::KNearest::create()); 
 	model->train(mTrained, cv::ml::ROW_SAMPLE, mClassification);
 
-	cv::Mat mFind = cv::imread("Resourses/Test.png");
+	cv::Mat mFind = cv::imread("Resourses/Test3.png");
 	if(mFind.empty())
 	{
 		std::cerr << "Cannot load image for finding\n";
@@ -118,7 +134,7 @@ BOOL FindSymbols(std::string *pResult /* = new std::string*/)
 	}
 
 	std::vector<std::vector<cv::Point>> contours;
-	cv::Mat tmp = FilterImage(mFind, contours);
+	cv::Mat tmp = FilterImageAndFindContours(mFind, contours);
 
 	std::vector<Object> validContours;
 	for(SIZE_T i = 0; i < contours.size(); ++i) 
@@ -145,9 +161,10 @@ BOOL FindSymbols(std::string *pResult /* = new std::string*/)
 		*pResult += static_cast<CHAR>(mChar.at<FLOAT>(0, 0));
 	}
 	cv::imshow("Result", mFind);
+	
 	std::cout << "Found symbols: " << *pResult << std::endl;
 
-	cvWaitKey(0);
+	cv::waitKeyEx(0);
 	cv::destroyAllWindows();
 
 	return TRUE;

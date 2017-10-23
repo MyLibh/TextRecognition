@@ -13,7 +13,10 @@
 
 #include "Object.hpp"
 
-cv::Mat FilterImage(CONST cv::Mat&, std::vector<std::vector<cv::Point>>&);
+#define SHOW_ALL
+
+inline VOID ShowWindow(CONST std::string&, CONST cv::Mat&);
+cv::Mat FilterImageAndFindContours(CONST cv::Mat&, std::vector<std::vector<cv::Point>>&);
 
 #pragma region Learning 
 

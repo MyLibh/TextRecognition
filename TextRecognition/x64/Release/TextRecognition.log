@@ -1,8 +1,7 @@
 ﻿  TextRecognition.cpp
-  main.cpp
   Создание кода
-  6 of 307 functions ( 2.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    8 functions had inline decision re-evaluated but remain unchanged
+  6 of 308 functions ( 1.9%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
-  TextRecognition.vcxproj -> C:\Users\Aleksei goliguzov\Documents\Visual Studio 2017\Projects\TextRecognition\x64\Release\TextRecognition.exe
+  TextRecognition.vcxproj -> C:\Users\Aleksei goliguzov\Documents\Github\TextRecognition\x64\Release\TextRecognition.exe
