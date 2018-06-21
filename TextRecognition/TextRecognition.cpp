@@ -3,6 +3,12 @@
 
 #include "TextRecognition.hpp"
 
+#ifdef NDEBUG_
+	#pragma comment(lib, "opencv_world340d.lib")
+#else
+	#pragma comment(lib, "opencv_world340.lib")
+#endif // NDEBUG_
+
 inline VOID ShowWindow(CONST std::string &crsTitle, CONST cv::Mat &crmImage)
 {
 #ifdef SHOW_ALL
